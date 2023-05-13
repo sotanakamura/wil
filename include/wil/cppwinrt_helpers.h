@@ -350,3 +350,37 @@ namespace wil
 #pragma pop_macro("ABI")
 #endif
 #endif // __WIL_CPPWINRT_WINDOWS_UI_INTEROP_HELPERS
+
+namespace wil
+{
+    class WinUIApplication
+    {
+        struct XamlApplication : public winrt::Microsoft::UI::Xaml::ApplicationT<XamlApplication, winrt::Microsoft::UI::Xaml::Markup::IXamlMetadataProvider>
+        {
+            void OnLaunched(winrt::Microsoft::UI::Xaml::LaunchActivatedEventArgs const&)
+            {
+                Resources().MergedDictionaries().Append(winrt::Microsoft::UI::Xaml::Controls::XamlControlsResources());
+            }
+            winrt::Microsoft::UI::Xaml::Markup::IXamlType GetXamlType(winrt::Windows::UI::Xaml::Interop::TypeName const& type)
+            {
+                return provider.GetXamlType(type);
+            }
+            winrt::Microsoft::UI::Xaml::Markup::IXamlType GetXamlType(winrt::hstring const& fullname)
+            {
+                return provider.GetXamlType(fullname);
+            }
+            winrt::com_array<winrt::Microsoft::UI::Xaml::Markup::XmlnsDefinition> GetXmlnsDefinitions()
+            {
+                return provider.GetXmlnsDefinitions();
+            }
+        private:
+            winrt::Microsoft::UI::Xaml::XamlTypeInfo::XamlControlsXamlMetaDataProvider provider;
+        };
+        winrt::Microsoft::UI::Xaml::Application app{ nullptr };
+    public:
+        WinUIApplication()
+        {
+            app = winrt::make<XamlApplication>();
+        }
+    };
+}
